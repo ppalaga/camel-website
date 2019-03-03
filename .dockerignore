@@ -1,1 +1,8 @@
 **/*
+!publish
+!package.json
+!yarn.lock
+!.yarnrc
+!antora-ui-camel/package.json
+!antora-ui-camel/yarn.lock
+

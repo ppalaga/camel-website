@@ -3,17 +3,30 @@ workflow "Build and publish the website" {
   resolves = ["Publish"]
 }
 
-action "Build theme" {
-  uses = "./.github/action-website"
+action "Theme dependencies" {
+  uses = "apache/camel-website@master"
   runs = "yarn"
-  args = "--non-interactive --frozen-lockfile --cwd antora-ui-camel"
+  args = "--non-interactive --frozen-lockfile --cwd antora-ui-camel install"
+}
+
+action "Build theme" {
+  uses = "apache/camel-website@master"
+  needs = ["Theme dependencies"]
+  runs = "yarn"
+  args = "--non-interactive --frozen-lockfile --cwd antora-ui-camel gulp"
+}
+
+action "Website dependencies" {
+  uses = "apache/camel-website@master"
+  runs = "yarn"
+  args = "--non-interactive --frozen-lockfile install"
 }
 
 action "Build website" {
-  uses = "./.github/action-website"
-  needs = ["Build theme"]
+  uses = "apache/camel-website@master"
+  needs = ["Build theme","Website dependencies"]
   runs = "yarn"
-  args = "--non-interactive --frozen-lockfile"
+  args = "--non-interactive --frozen-lockfile build"
 }
 
 action "On master branch" {
@@ -23,7 +36,7 @@ action "On master branch" {
 }
 
 action "Publish" {
-  uses = "./.github/action-website"
+  uses = "apache/camel-website@master"
   needs = ["On master branch"]
   runs = "publish"
   secrets = ["GITHUB_TOKEN"]
